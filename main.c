@@ -24,6 +24,7 @@ int main(int argc, char *argv[]) {
 	int regexec_result;
 	regmatch_t window_matches[NUMBER_MATCHES];
 	char window_title[4096];
+	unsigned short int number_windows = 0; 
 
 	while (fgets(output, sizeof(output), fp) != NULL) {
 		// printf("%s", output);
@@ -37,9 +38,12 @@ int main(int argc, char *argv[]) {
 		strncpy(window_title, output + window_matches[4].rm_so, length);
 		window_title[length] = '\0';
 		printf("Window title: %s\n", window_title);
+		number_windows++; 
 	}
 	pclose(fp);
 	regfree(window_regex);
+
+	printf("The number of open windows is %d\n", number_windows);
 
 	regex_t *monitor_regex = make_monitor_regex();
 	if (monitor_regex == NULL) {
