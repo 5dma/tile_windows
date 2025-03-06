@@ -77,6 +77,11 @@ int main(int argc, char *argv[]) {
 
 				if ((x_window_attributes.map_state == IsViewable) && (x_window_attributes.override_redirect == 0)) {
 					printf("Found a window\n");
+
+					if (current_window == 18876012) {
+						XMoveWindow(display, current_window, 10, 10);
+						
+					}
 				}
 				
 				Atom * property_list = XListProperties(display, current_window, &number_properties);
