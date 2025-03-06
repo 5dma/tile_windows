@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
 	FILE *outfile;
 	outfile = fopen("/tmp/stuff.csv","w");
 	FILE *property_file = fopen("/tmp/property_file.csv","w");
-	fprintf(outfile, "window\tx\ty\twidth\theight\tborder_width\tdepth\troot\tbit_gravity\twin_gravity\tmap_state\tnumber_properties\n");
+	fprintf(outfile, "window\tx\ty\twidth\theight\tborder_width\tdepth\troot\tbit_gravity\twin_gravity\tmap_state\toverride_redirect\tnumber_properties\n");
 	fprintf(property_file, "window\tAtom\tName\tactual_type\tactual_format\tnitems_return\tbytes_after_return\tprop_return\n");
 
 	for (unsigned int i = 0; i<nchildren_return; i++) {
@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
 		Atom *property_list = XListProperties(display, children_return[i], &number_properties);
 		status = XGetWindowAttributes(display, current_window, &x_window_attributes);
 		if (status != 0) {
-		fprintf(outfile, "%ld\t%d\t%d\t%d\t%d\t%d\t%d\t%ld\t%d\t%d\t%d\t%d\n",
+		fprintf(outfile, "%ld\t%d\t%d\t%d\t%d\t%d\t%d\t%ld\t%d\t%d\t%d\t%d\t%d\n",
 			current_window, 
 				x_window_attributes.x, 
 				x_window_attributes.y,
@@ -72,9 +72,16 @@ int main(int argc, char *argv[]) {
 				x_window_attributes.bit_gravity,
 				x_window_attributes.win_gravity,
 				x_window_attributes.map_state,
+				x_window_attributes.override_redirect,
 				number_properties);
+
+				if ((x_window_attributes.map_state == IsViewable) && (x_window_attributes.override_redirect == 0)) {
+					printf("Found a window\n");
+				}
 				
 				Atom * property_list = XListProperties(display, current_window, &number_properties);
+				XTextProperty text_prop;
+				Status status_getname = XGetWMName(display, current_window, &text_prop);
 				Atom actual_type_return;
 				int actual_format_return;
 				unsigned long nitems_return;
@@ -96,7 +103,9 @@ int main(int argc, char *argv[]) {
 							nitems_return,
 							bytes_after_return,
 							prop_return);
-
+							if (actual_format_return == 32) {
+								long *trash = (long *)prop_return;
+							}
 					} else {
 						printf("Failed on getting a property\n");
 					}
