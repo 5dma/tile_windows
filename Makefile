@@ -13,8 +13,8 @@ SRCEXT      := c
 OBJEXT      := o
 INSTALLDIR  := /usr/local/bin/
 #Flags, Libraries and Includes
-CFLAGS      := -g -Wall -I/usr/include/
-LFLAGS      := -lX11
+CFLAGS      := -g -Wall -I/usr/include/ `pkg-config --cflags glib-2.0`
+LFLAGS      := `pkg-config --libs glib-2.0` -lX11
 INC          := -I$(INCDIR)
 
 #---------------------------------------------------------------------------------
