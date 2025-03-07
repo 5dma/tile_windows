@@ -26,11 +26,9 @@ void move_resize_windows(gpointer data, gpointer user_data) {
 	Layout_Info *layout_info = (Layout_Info *)user_data;
 	Window_Info *window_info = (Window_Info *)data;
 	layout_info->current_window_position++;
+
 	/* Don't move the background or the panel. */
-	if (window_info == layout_info->background) {
-		return;
-	}
-	if (window_info == layout_info->panel) {
+	if ((window_info == layout_info->background) || (window_info == layout_info->panel)) {
 		return;
 	}
 
