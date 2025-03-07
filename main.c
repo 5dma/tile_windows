@@ -1,11 +1,6 @@
-#include <X11/Xatom.h>
 #include <X11/Xlib.h>
-#include <X11/Xutil.h>
 #include <glib-2.0/glib.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 
 #define SPACING 20 /* Spacing between each window's top-left corner. */
 
