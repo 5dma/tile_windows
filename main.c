@@ -7,6 +7,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#define SPACING 20
+
 typedef struct Window_Info{
 	Window window;
 	int x;
@@ -15,15 +17,31 @@ typedef struct Window_Info{
 	int height;
 } Window_Info;
 
+typedef struct Layout_Info {
+	Window_Info *background;
+	Window_Info *panel;
+	int width;
+	int height;
+	int current_window_position;
+} Layout_Info;
 
 
 void move_windows(gpointer data,  gpointer user_data) {
-	printf("Top level\n");
+	Layout_Info *layout_info = (Layout_Info *) user_data;
 	Window_Info *window_info = (Window_Info *)data;
-	printf("%d\t%d\t%d\t%d\n",window_info->x,
+	layout_info->current_window_position++;
+	if (window_info == layout_info->background) {
+		return;
+	}
+	if (window_info == layout_info->panel) {
+		return;
+	}
+	printf("%d\t%d\t%d\t%d\t%d\n",layout_info->current_window_position,
+							window_info->x,
 								window_info->y,
 								window_info->width,
 								window_info->height);
+
 }
 
 
@@ -48,31 +66,17 @@ int main(int argc, char *argv[]) {
 		printf("Fatal error. XQueryTree failed with a status %d\n", status);
 		exit(-1);
 	}
-	Window current_window;
-	XWindowAttributes x_window_attributes;
 
-	XWindowAttributes *background;
-	XWindowAttributes *panel;
+	XWindowAttributes x_window_attributes;
+	Layout_Info layout_info;
+	layout_info.current_window_position = -1;
+
 
 	for (unsigned int i = 0; i < nchildren_return; i++) {
 		status = XGetWindowAttributes(display, children_return[i], &x_window_attributes);
 		if (status != 0) {
-			/* 			fprintf(outfile, "%ld\t%d\t%d\t%d\t%d\t%d\t%d\t%ld\t%d\t%d\t%d\t%d\n",
-								current_window,
-								x_window_attributes.x,
-								x_window_attributes.y,
-								x_window_attributes.width,
-								x_window_attributes.height,
-								x_window_attributes.border_width,
-								x_window_attributes.depth,
-								x_window_attributes.root,
-								x_window_attributes.bit_gravity,
-								x_window_attributes.win_gravity,
-								x_window_attributes.map_state,
-								x_window_attributes.override_redirect);
-			 */
 			if ((x_window_attributes.map_state == IsViewable) && (x_window_attributes.override_redirect == 0)) {
-				printf("Found a window\n");
+				printf("Found a window %d\n", i);
 				printf("%d\t%d\t%d\t%d\n",x_window_attributes.x,
 								x_window_attributes.y,
 								x_window_attributes.width,
@@ -85,17 +89,24 @@ int main(int argc, char *argv[]) {
 				window_info->width = x_window_attributes.width;
 				visible_windows = g_slist_append(visible_windows, window_info);
 			}
-			/* 			if (current_window == 18876012) {
-							XMoveWindow(display, current_window, 10, 10);
-						} */
 		} else {
 			printf("Got a status error on XGetWindowAttributes\n");
 		}
 	}
-	g_slist_foreach (visible_windows, move_windows, NULL);
+
+	int omg = g_slist_length(visible_windows);
+	printf("There are %d elements in this list\n", omg);
+	gpointer trash = g_slist_nth_data (visible_windows, 0);
+	Window_Info *background_info = (Window_Info *) trash;
+	gpointer trash2 = g_slist_nth_data (visible_windows, omg - 1);
+	Window_Info *panel_info = (Window_Info *) trash2;
+	layout_info.background = background_info;
+	layout_info.panel = panel_info;
+	layout_info.width = background_info->width;
+	layout_info.height = background_info->height - panel_info->height;
+
+	g_slist_foreach (visible_windows, move_windows, &layout_info);
 
 	XCloseDisplay(display);
-	/* fclose(outfile);
-	fclose(property_file); */
 	return 0;
 }
