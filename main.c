@@ -44,6 +44,9 @@ void move_windows(gpointer data,  gpointer user_data) {
 								window_info->height);
 
 	XMoveWindow(layout_info->display, window_info->window,layout_info->current_window_position * SPACING, layout_info->current_window_position * SPACING);
+	if (window_info->width + (layout_info->current_window_position * SPACING) > layout_info->background->width) {
+		XResizeWindow(layout_info->display, window_info->window,  layout_info->background->width - (layout_info->current_window_position * SPACING), window_info->height);
+	}
 }
 
 
