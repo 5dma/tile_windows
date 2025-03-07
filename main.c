@@ -40,6 +40,12 @@ void move_resize_windows(gpointer data, gpointer user_data) {
 	}
 }
 
+/* Frees window data in a GSList. */
+void free_visible_windows (gpointer data) {
+	Window_Info *window_info = (Window_Info *)data;
+	g_free(window_info);
+}
+
 int main(int argc, char *argv[]) {
 	/* Passed as user data to move_resize_windows(). */
 	Layout_Info layout_info;
@@ -109,6 +115,9 @@ int main(int argc, char *argv[]) {
 	/* Go move the windows.*/
 	g_slist_foreach(visible_windows, move_resize_windows, &layout_info);
 
+	/* Clean up memory. */
+	g_slist_free_full (visible_windows, free_visible_windows);
+	XFree(children_return);
 	XCloseDisplay(layout_info.display);
 	return 0;
 }
