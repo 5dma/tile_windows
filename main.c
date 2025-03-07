@@ -23,6 +23,7 @@ typedef struct Layout_Info {
 	int width;
 	int height;
 	int current_window_position;
+	Display *display;
 } Layout_Info;
 
 
@@ -42,6 +43,7 @@ void move_windows(gpointer data,  gpointer user_data) {
 								window_info->width,
 								window_info->height);
 
+	XMoveWindow(layout_info->display, window_info->window,layout_info->current_window_position * SPACING, layout_info->current_window_position * SPACING);
 }
 
 
@@ -70,6 +72,7 @@ int main(int argc, char *argv[]) {
 	XWindowAttributes x_window_attributes;
 	Layout_Info layout_info;
 	layout_info.current_window_position = -1;
+	layout_info.display = display;
 
 
 	for (unsigned int i = 0; i < nchildren_return; i++) {
