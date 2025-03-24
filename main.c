@@ -104,10 +104,8 @@ int main(int argc, char *argv[]) {
 	last window in the list (panel). */
 	gpointer trash = g_slist_nth_data(visible_windows, 0);
 	Window_Info *background_info = (Window_Info *)trash;
-	/* Using g_slist_last() here doesn't work; why not? */
-	unsigned int list_length = g_slist_length(visible_windows);
-	gpointer trash2 = g_slist_nth_data(visible_windows, list_length - 1);
-	Window_Info *panel_info = (Window_Info *)trash2;
+
+	Window_Info *panel_info = g_slist_last(visible_windows)->data;
 	layout_info.background = background_info;
 	layout_info.panel = panel_info;
 	layout_info.height = background_info->height - panel_info->height;
